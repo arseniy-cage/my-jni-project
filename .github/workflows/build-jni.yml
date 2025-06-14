@@ -15,47 +15,47 @@ jobs:
 
     - name: Install dependencies
       run: |
-        # Устанавливаем Chocolatey (пакетный менеджер для Windows)
-        Set-ExecutionPolicy Bypass -Scope Process -Force
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-        
         # Устанавливаем необходимые инструменты
         choco install -y 7zip curl
 
-    - name: Download NDK (alternative method)
+    - name: Download NDK from Google Drive
       run: |
-        # Получаем cookies для авторизации (если файл доступен по ссылке)
-        $headers = @{
-          "Authorization" = "Bearer $env:GDRIVE_TOKEN"
+        # Скачиваем через google-drive-downloader
+        $fileId = "1ThXZY2oy-K1ycO489_9P7OO4evG4lcIT"
+        $output = "ndk.zip"
+        
+        # Получаем подтверждающий код
+        $confirmCode = (curl.exe -s -L -b "/tmp/cookies.txt" "https://drive.google.com/uc?export=download&id=$fileId" | Select-String -Pattern "confirm=([0-9A-Za-z_]+)" | ForEach-Object { $_.Matches.Groups[1].Value })
+        
+        if (-not $confirmCode) {
+          $confirmCode = "t" # fallback
         }
         
-        # Альтернативный метод скачивания
-        curl.exe -L -o ndk.zip "https://drive.google.com/uc?export=download&id=1ThXZY2oy-K1ycO489_9P7OO4evG4lcIT&confirm=t"
+        # Скачиваем файл с подтверждением
+        curl.exe -L -b "/tmp/cookies.txt" "https://drive.google.com/uc?export=download&id=$fileId&confirm=$confirmCode" -o $output
         
-        # Проверяем скачанный файл
-        if (!(Test-Path ndk.zip)) {
-          Write-Error "Failed to download NDK!"
+        # Проверяем размер файла (должен быть больше 1MB)
+        $fileInfo = Get-Item $output
+        if ($fileInfo.Length -lt 1MB) {
+          Write-Error "Downloaded file is too small! Probably failed to download."
           exit 1
         }
-        
-        # Распаковываем
+
+    - name: Extract NDK
+      run: |
         7z x ndk.zip -o"$env:USERPROFILE\android-ndk-r16b" -y
-        
-        # Устанавливаем переменные окружения
+        if (-not (Test-Path "$env:USERPROFILE\android-ndk-r16b\ndk-build.cmd")) {
+          Write-Error "NDK extraction failed or ndk-build.cmd not found!"
+          exit 1
+        }
         echo "NDK_HOME=$env:USERPROFILE\android-ndk-r16b" >> $env:GITHUB_ENV
         echo "$env:USERPROFILE\android-ndk-r16b" >> $env:GITHUB_PATH
 
-    - name: Verify NDK installation
+    - name: Verify NDK
       run: |
-        echo "NDK path: $env:NDK_HOME"
+        echo "NDK contents:"
         dir "$env:NDK_HOME"
-        if (Test-Path "$env:NDK_HOME\ndk-build.cmd") {
-          call "$env:NDK_HOME\ndk-build.cmd" --version
-        } else {
-          Write-Error "ndk-build.cmd not found!"
-          exit 1
-        }
+        call "$env:NDK_HOME\ndk-build.cmd" --version
 
     - name: Build JNI
       run: |
@@ -63,8 +63,8 @@ jobs:
         call "$env:NDK_HOME\ndk-build.cmd" -C . clean
         call "$env:NDK_HOME\ndk-build.cmd" -C .
 
-    - name: Upload compiled artifacts
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: jni-compiled-libraries
+        name: jni-libs
         path: libs/
