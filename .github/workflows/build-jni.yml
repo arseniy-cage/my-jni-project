@@ -1,34 +1,42 @@
-name: Build JNI
+name: Build JNI with Windows NDK r16b
 
 on:
   push:
     branches:
-      - main # Или master, если у вас так называется основная ветка
+      - main
 
 jobs:
   build:
-    runs-on: ubuntu-latest # Используем последнюю версию Ubuntu (сейчас это 24.04)
+    runs-on: windows-latest  # Используем Windows runner
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # --- УДАЛИТЕ ЭТОТ ШАГ, ОН БОЛЬШЕ НЕ НУЖЕН И НЕ РАБОТАЕТ НА UBUNTU-LATEST ---
-    # - name: Install libncurses5 (for old NDKs)
-    #   run: |
-    #     sudo apt-get update
-    #     sudo apt-get install -y libncurses5
-    # ----------------------------------------------------------------------
+    - name: Install dependencies
+      run: |
+        # Устанавливаем Python и gdown для скачивания с Google Drive
+        python -m pip install --upgrade pip
+        pip install gdown
 
-    - name: Setup Android NDK
-      uses: nttld/setup-ndk@v1 # Используем экшн для установки NDK
-      with:
-        ndk-version: r21e # *** ИЗМЕНЕНИЕ ЗДЕСЬ: Указываем NDK r21e ***
+    - name: Download NDK from Google Drive
+      run: |
+        gdown "https://drive.google.com/uc?id=1ThXZY2oy-K1ycO489_9P7OO4evG4lcIT" -O ndk.zip
+        7z x ndk.zip -o"$env:USERPROFILE\android-ndk-r16b" -y
+        echo "NDK_HOME=$env:USERPROFILE\android-ndk-r16b" >> $env:GITHUB_ENV
+        echo "$env:USERPROFILE\android-ndk-r16b" >> $env:GITHUB_PATH
+
+    - name: Verify NDK installation
+      run: |
+        echo "NDK path: $env:NDK_HOME"
+        dir "$env:NDK_HOME"
+        call "$env:NDK_HOME\ndk-build.cmd" --version
 
     - name: Build JNI
       run: |
-        ndk-build -C . clean
-        ndk-build -C .
+        cd $env:GITHUB_WORKSPACE
+        call "$env:NDK_HOME\ndk-build.cmd" -C . clean
+        call "$env:NDK_HOME\ndk-build.cmd" -C .
 
     - name: Upload compiled artifacts
       uses: actions/upload-artifact@v4
