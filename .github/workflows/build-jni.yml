@@ -1,0 +1,40 @@
+name: Build JNI
+
+on:
+  push:
+    branches:
+      - main # Или master, если у вас так называется основная ветка
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Используем последнюю версию Ubuntu для сборки
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4 # Скачиваем ваш код из репозитория
+
+    - name: Setup Android NDK
+      uses: nttld/setup-ndk@v1 # Используем экшн для установки NDK
+      with:
+        ndk-version: r16b # Укажите версию NDK, которую вы использовали (r16b)
+
+    - name: Build JNI
+      run: |
+        # Перейдите в директорию с вашим JNI проектом
+        # Если ваши исходники JNI находятся прямо в корне репозитория, то cd не нужен.
+        # Если они находятся в подпапке (например, 'jni'), тогда:
+        # cd jni
+        # ndk-build
+        #
+        # Учитывая ваш скриншот, похоже, что файлы типа Android.mk находятся в корне папки jni.
+        # Поэтому, если вы загрузили содержимое папки 'jni' прямо в корень репозитория,
+        # тогда просто 'ndk-build'. Если вы загрузили папку 'jni' внутрь репозитория
+        # (т.е. путь будет /jni/Android.mk), тогда `cd jni && ndk-build`.
+        # Давайте предположим, что вы загрузили содержимое папки 'jni' в корень репозитория.
+        ndk-build -C . # -C . указывает на текущую директорию как корень проекта
+
+    - name: Upload compiled artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: jni-compiled-libraries
+        path: libs/ # Директория, куда ndk-build помещает скомпилированные библиотеки
