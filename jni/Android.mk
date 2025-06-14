@@ -1,56 +1,89 @@
 LOCAL_PATH := $(call my-dir)
 
+# Prebuilt static libraries
+# Define and include each prebuilt static library separately.
+
 include $(CLEAR_VARS)
-LOCAL_MODULE    := libopenal 
+LOCAL_MODULE := openal # Module name without 'lib' prefix
 LOCAL_SRC_FILES := vendor/openal/libopenal.a
-
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE    := libopus 
+LOCAL_MODULE := opus # Module name without 'lib' prefix
 LOCAL_SRC_FILES := vendor/opus/libopus.a
-
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE    := libenet 
+LOCAL_MODULE := enet # Module name without 'lib' prefix
 LOCAL_SRC_FILES := vendor/enet/libenet.a
-
 include $(PREBUILT_STATIC_LIBRARY)
 
+
+# Main project module: sampvoice
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := sampvoice
+# System libraries to link against
 LOCAL_LDLIBS := -llog -lOpenSLES -lGLESv2 -lEGL
 
-LOCAL_C_INCLUDES += $(wildcard $(LOCAL_PATH)/vendor/)
+# Include directories for headers
+# Ensure all directories containing header files (.h) are listed here.
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/vendor/ini \
+                    $(LOCAL_PATH)/vendor/RakNet \
+                    $(LOCAL_PATH)/vendor/RakNet/SAMP \
+                    $(LOCAL_PATH)/vendor/imgui \
+                    $(LOCAL_PATH)/vendor/hash \
+                    $(LOCAL_PATH)/voice \
+                    $(LOCAL_PATH)/net \
+                    $(LOCAL_PATH)/util \
+                    $(LOCAL_PATH)/cryptors \
+                    $(LOCAL_PATH)/game \
+                    $(LOCAL_PATH)/game/GTASA/Core \
+                    $(LOCAL_PATH)/game/GTASA/Models \
+                    $(LOCAL_PATH)/game/RW \
+                    $(LOCAL_PATH)/gtare \
+                    $(LOCAL_PATH)/clientlogic \
+                    $(LOCAL_PATH)/gui \
+                    $(LOCAL_PATH)/santrope-tea-gtasa/encryption # IMPORTANT: This path assumes 'santrope-tea-gtasa' is directly inside your JNI root folder.
 
-# samp
-FILE_LIST := $(wildcard $(LOCAL_PATH)/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/game/*.cpp)
+# Source files for the sampvoice module
+# List all .cpp and .c files here.
+LOCAL_SRC_FILES := \
+    $(wildcard $(LOCAL_PATH)/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/game/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/gtare/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/clientlogic/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/net/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/util/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/game/RW/RenderWare.cpp) \
+    $(wildcard $(LOCAL_PATH)/gui/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/voice/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/cryptors/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/game/GTASA/Models/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/game/GTASA/Core/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/santrope-tea-gtasa/encryption/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/santrope-tea-gtasa/encryption/*.c) \
+    $(wildcard $(LOCAL_PATH)/vendor/ini/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/vendor/RakNet/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/vendor/RakNet/SAMP/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/vendor/imgui/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/vendor/hash/md5.cpp)
 
-FILE_LIST += $(wildcard $(LOCAL_PATH)/gtare/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/clientlogic/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/net/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/util/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/game/RW/RenderWare.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/gui/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/voice/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/cryptors/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/game/GTASA/Models/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/game/GTASA/Core/*.cpp)
+# Link against the prebuilt static libraries defined above
+LOCAL_STATIC_LIBRARIES := openal opus enet
 
-FILE_LIST += $(wildcard $(LOCAL_PATH)/../santrope-tea-gtasa/encryption/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/../santrope-tea-gtasa/encryption/*.c)
-
-# vendor
-FILE_LIST += $(wildcard $(LOCAL_PATH)/vendor/ini/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/vendor/RakNet/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/vendor/RakNet/SAMP/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/vendor/imgui/*.cpp)
-FILE_LIST += $(wildcard $(LOCAL_PATH)/vendor/hash/md5.cpp)
-
-LOCAL_SRC_FILES := $(FILE_LIST:$(LOCAL_PATH)/%=%)
-LOCAL_STATIC_LIBRARIES := libopenal libopus libenet
+# Compiler flags
+# -w: Suppress all warnings
+# -s: Strip symbols (reduces size)
+# -fvisibility=hidden: Control symbol visibility
+# -pthread: Link with pthreads (for threading)
+# -Wall: Enable most common warnings (often used with -Werror)
+# -fpack-struct=1: Pack structs tightly (can affect performance/alignment)
+# -O2: Optimization level 2
+# -std=c++14: Use C++14 standard
+# -fexceptions: Enable exception handling
 LOCAL_CPPFLAGS := -w -s -fvisibility=hidden -pthread -Wall -fpack-struct=1 -O2 -std=c++14 -fexceptions
+# LOCAL_CFLAGS := -Wno-error # Uncomment if you need to downgrade compile errors to warnings (use with caution)
+
+# Build the shared library (your .so file)
 include $(BUILD_SHARED_LIBRARY)
