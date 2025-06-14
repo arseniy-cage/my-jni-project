@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest  # Используем Windows runner
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
@@ -15,14 +15,34 @@ jobs:
 
     - name: Install dependencies
       run: |
-        # Устанавливаем Python и gdown для скачивания с Google Drive
-        python -m pip install --upgrade pip
-        pip install gdown
+        # Устанавливаем Chocolatey (пакетный менеджер для Windows)
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        
+        # Устанавливаем необходимые инструменты
+        choco install -y 7zip curl
 
-    - name: Download NDK from Google Drive
+    - name: Download NDK (alternative method)
       run: |
-        gdown "https://drive.google.com/uc?id=1ThXZY2oy-K1ycO489_9P7OO4evG4lcIT" -O ndk.zip
+        # Получаем cookies для авторизации (если файл доступен по ссылке)
+        $headers = @{
+          "Authorization" = "Bearer $env:GDRIVE_TOKEN"
+        }
+        
+        # Альтернативный метод скачивания
+        curl.exe -L -o ndk.zip "https://drive.google.com/uc?export=download&id=1ThXZY2oy-K1ycO489_9P7OO4evG4lcIT&confirm=t"
+        
+        # Проверяем скачанный файл
+        if (!(Test-Path ndk.zip)) {
+          Write-Error "Failed to download NDK!"
+          exit 1
+        }
+        
+        # Распаковываем
         7z x ndk.zip -o"$env:USERPROFILE\android-ndk-r16b" -y
+        
+        # Устанавливаем переменные окружения
         echo "NDK_HOME=$env:USERPROFILE\android-ndk-r16b" >> $env:GITHUB_ENV
         echo "$env:USERPROFILE\android-ndk-r16b" >> $env:GITHUB_PATH
 
@@ -30,7 +50,12 @@ jobs:
       run: |
         echo "NDK path: $env:NDK_HOME"
         dir "$env:NDK_HOME"
-        call "$env:NDK_HOME\ndk-build.cmd" --version
+        if (Test-Path "$env:NDK_HOME\ndk-build.cmd") {
+          call "$env:NDK_HOME\ndk-build.cmd" --version
+        } else {
+          Write-Error "ndk-build.cmd not found!"
+          exit 1
+        }
 
     - name: Build JNI
       run: |
