@@ -7,27 +7,26 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest # Используем последнюю версию Ubuntu для сборки
+    # --- ИЗМЕНЕНИЕ ЗДЕСЬ: используем ubuntu-20.04 ---
+    runs-on: ubuntu-20.04 # Используем Ubuntu 20.04, так как в ней ещё есть libncurses5
+    # ------------------------------------------------
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4 # Скачиваем ваш код из репозитория
+      uses: actions/checkout@v4
 
-    # --- НОВЫЙ ШАГ: Установка libncurses5 ---
     - name: Install libncurses5 (for old NDKs)
       run: |
         sudo apt-get update
         sudo apt-get install -y libncurses5
-    # ----------------------------------------
 
     - name: Setup Android NDK
-      uses: nttld/setup-ndk@v1 # Используем экшн для установки NDK
+      uses: nttld/setup-ndk@v1
       with:
         ndk-version: r16b # Укажите версию NDK, которую вы использовали (r16b)
 
     - name: Build JNI
       run: |
-        # Мы добавили clean, чтобы убедиться, что всегда происходит полная сборка.
         ndk-build -C . clean
         ndk-build -C .
 
@@ -35,4 +34,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: jni-compiled-libraries
-        path: libs/ # Директория, куда ndk-build помещает скомпилированные библиотеки
+        path: libs/
