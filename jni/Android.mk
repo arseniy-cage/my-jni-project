@@ -66,53 +66,56 @@ LOCAL_SRC_FILES := \
     $(LOCAL_PATH)/vendor/hash/md5.cpp \
     \
     # Явно перечисленные файлы шифрования из santrope-tea-gtasa/encryption
-    $(LOCAL_PATH)/santrope-tea-gtasa/encryption/aes.c \
-    $(LOCAL_PATH)/santrope-tea-gtasa/encryption/CTEA.cpp \
-    $(LOCAL_PATH)/santrope-tea-gtasa/encryption/CTinyEncrypt.cpp \
-    $(LOCAL_PATH)/santrope-tea-gtasa/encryption/CXTEA3.cpp \
+    # Убедитесь, что здесь используются ТАБУЛЯЦИИ, а не пробелы
+	$(LOCAL_PATH)/santrope-tea-gtasa/encryption/aes.c \
+	$(LOCAL_PATH)/santrope-tea-gtasa/encryption/CTEA.cpp \
+	$(LOCAL_PATH)/santrope-tea-gtasa/encryption/CTinyEncrypt.cpp \
+	$(LOCAL_PATH)/santrope-tea-gtasa/encryption/CXTEA3.cpp \
     # Добавьте сюда b64.cpp, если он существует:
-    # $(LOCAL_PATH)/santrope-tea-gtasa/encryption/b64.cpp \
+    #	$(LOCAL_PATH)/santrope-tea-gtasa/encryption/b64.cpp \
     # Добавьте сюда encrypt.cpp, если он существует (хотя имя файла 'encrypt' очень общее):
-    # $(LOCAL_PATH)/santrope-tea-gtasa/encryption/encrypt.cpp \
+    #	$(LOCAL_PATH)/santrope-tea-gtasa/encryption/encrypt.cpp \
     \
     # Явно перечисленные файлы RakNet из vendor/raknet/
-    $(LOCAL_PATH)/vendor/raknet/AutoRPC.cpp \
-    $(LOCAL_PATH)/vendor/raknet/BitStream.cpp \
-    $(LOCAL_PATH)/vendor/raknet/CommandParserInterface.cpp \
-    $(LOCAL_PATH)/vendor/raknet/DR_SHA1.cpp \
-    $(LOCAL_PATH)/vendor/raknet/FileListTransfer.cpp \
-    $(LOCAL_PATH)/vendor/raknet/GetTime.cpp \
-    $(LOCAL_PATH)/vendor/raknet/Gets.cpp \
-    $(LOCAL_PATH)/vendor/raknet/HTTPConnection2.cpp \
-    $(LOCAL_PATH)/vendor/raknet/InternalPacket.cpp \
-    $(LOCAL_PATH)/vendor/raknet/Itoa.cpp \
-    $(LOCAL_PATH)/vendor/raknet/PacketLogger.cpp \
-    $(LOCAL_PATH)/vendor/raknet/RakClient.cpp \
-    $(LOCAL_PATH)/vendor/raknet/RakNetworkFactory.cpp \
-    $(LOCAL_PATH)/vendor/raknet/RakPeer.cpp \
-    $(LOCAL_PATH)/vendor/raknet/RakSleep.cpp \
-    $(LOCAL_PATH)/vendor/raknet/RakString.cpp \
-    $(LOCAL_PATH)/vendor/raknet/Rand.cpp \
-    $(LOCAL_PATH)/vendor/raknet/ReliabilityLayer.cpp \
-    $(LOCAL_PATH)/vendor/raknet/SHA1.cpp \
-    $(LOCAL_PATH)/vendor/raknet/SimpleMutex.cpp \
-    $(LOCAL_PATH)/vendor/raknet/SocketLayer.cpp \
-    $(LOCAL_PATH)/vendor/raknet/StringCompressor.cpp \
-    $(LOCAL_PATH)/vendor/raknet/StringTable.cpp \
-    $(LOCAL_PATH)/vendor/raknet/SystemAddressList.cpp \
-    $(LOCAL_PATH)/vendor/raknet/SystemDatabaseClient.cpp \
-    $(LOCAL_PATH)/vendor/raknet/SystemDatabaseServer.cpp \
-    $(LOCAL_PATH)/vendor/raknet/TCPInterface.cpp \
-    $(LOCAL_PATH)/vendor/raknet/TableSerializer.cpp \
-    $(LOCAL_PATH)/vendor/raknet/TelnetTransport.cpp \
-    $(LOCAL_PATH)/vendor/raknet/_findfirst.cpp \
-    $(LOCAL_PATH)/vendor/raknet/rakserver.cpp \
-    $(LOCAL_PATH)/vendor/raknet/rijndael.cpp \
+    # Убедитесь, что здесь используются ТАБУЛЯЦИИ, а не пробелы
+	$(LOCAL_PATH)/vendor/raknet/AutoRPC.cpp \
+	$(LOCAL_PATH)/vendor/raknet/BitStream.cpp \
+	$(LOCAL_PATH)/vendor/raknet/CommandParserInterface.cpp \
+	$(LOCAL_PATH)/vendor/raknet/DR_SHA1.cpp \
+	$(LOCAL_PATH)/vendor/raknet/FileListTransfer.cpp \
+	$(LOCAL_PATH)/vendor/raknet/GetTime.cpp \
+	$(LOCAL_PATH)/vendor/raknet/Gets.cpp \
+	$(LOCAL_PATH)/vendor/raknet/HTTPConnection2.cpp \
+	$(LOCAL_PATH)/vendor/raknet/InternalPacket.cpp \
+	$(LOCAL_PATH)/vendor/raknet/Itoa.cpp \
+	$(LOCAL_PATH)/vendor/raknet/PacketLogger.cpp \
+	$(LOCAL_PATH)/vendor/raknet/RakClient.cpp \
+	$(LOCAL_PATH)/vendor/raknet/RakNetworkFactory.cpp \
+	$(LOCAL_PATH)/vendor/raknet/RakPeer.cpp \
+	$(LOCAL_PATH)/vendor/raknet/RakSleep.cpp \
+	$(LOCAL_PATH)/vendor/raknet/RakString.cpp \
+	$(LOCAL_PATH)/vendor/raknet/Rand.cpp \
+	$(LOCAL_PATH)/vendor/raknet/ReliabilityLayer.cpp \
+	$(LOCAL_PATH)/vendor/raknet/SHA1.cpp \
+	$(LOCAL_PATH)/vendor/raknet/SimpleMutex.cpp \
+	$(LOCAL_PATH)/vendor/raknet/SocketLayer.cpp \
+	$(LOCAL_PATH)/vendor/raknet/StringCompressor.cpp \
+	$(LOCAL_PATH)/vendor/raknet/StringTable.cpp \
+	$(LOCAL_PATH)/vendor/raknet/SystemAddressList.cpp \
+	$(LOCAL_PATH)/vendor/raknet/SystemDatabaseClient.cpp \
+	$(LOCAL_PATH)/vendor/raknet/SystemDatabaseServer.cpp \
+	$(LOCAL_PATH)/vendor/raknet/TCPInterface.cpp \
+	$(LOCAL_PATH)/vendor/raknet/TableSerializer.cpp \
+	$(LOCAL_PATH)/vendor/raknet/TelnetTransport.cpp \
+	$(LOCAL_PATH)/vendor/raknet/_findfirst.cpp \
+	$(LOCAL_PATH)/vendor/raknet/rakserver.cpp \
+	$(LOCAL_PATH)/vendor/raknet/rijndael.cpp \
     \
     # Явно перечисленные файлы RakNet из vendor/raknet/SAMP/
-    $(LOCAL_PATH)/vendor/raknet/SAMP/SAMPRPC.cpp \
-    $(LOCAL_PATH)/vendor/raknet/SAMP/samp_auth.cpp \
-    $(LOCAL_PATH)/vendor/raknet/SAMP/samp_netencr.cpp
+    # Убедитесь, что здесь используются ТАБУЛЯЦИИ, а не пробелы
+	$(LOCAL_PATH)/vendor/raknet/SAMP/SAMPRPC.cpp \
+	$(LOCAL_PATH)/vendor/raknet/SAMP/samp_auth.cpp \
+	$(LOCAL_PATH)/vendor/raknet/SAMP/samp_netencr.cpp
 
 # Link against the prebuilt static libraries defined above
 LOCAL_STATIC_LIBRARIES := openal opus enet
