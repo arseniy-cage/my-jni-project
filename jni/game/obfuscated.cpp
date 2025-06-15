@@ -1,6 +1,6 @@
 #include "../main.h"
 #include "../util/armhook.h"
-#include "/common.h"
+#include "common.h"
 
 #include "..//..//santrope-tea-gtasa/encryption/common.h"
 
