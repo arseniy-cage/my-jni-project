@@ -30,8 +30,8 @@ LOCAL_LDLIBS := -llog -lOpenSLES -lGLESv2 -lEGL
 # Ensure all directories containing header files (.h) are listed here.
 # *** ИСПРАВЛЕНО: Убран лишний 'jni/' из всех путей ***
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/vendor/ini \
-                    $(LOCAL_PATH)/vendor/RakNet \
-                    $(LOCAL_PATH)/vendor/RakNet/SAMP \
+                    $(LOCAL_PATH)/vendor/raknet \
+                    $(LOCAL_PATH)/vendor/raknet/SAMP \
                     $(LOCAL_PATH)/vendor/imgui \
                     $(LOCAL_PATH)/vendor/hash \
                     $(LOCAL_PATH)/voice \
@@ -66,8 +66,8 @@ LOCAL_SRC_FILES := \
     $(wildcard $(LOCAL_PATH)/santrope-tea-gtasa/encryption/*.cpp) \
     $(wildcard $(LOCAL_PATH)/santrope-tea-gtasa/encryption/*.c) \
     $(wildcard $(LOCAL_PATH)/vendor/ini/*.cpp) \
-    $(wildcard $(LOCAL_PATH)/vendor/RakNet/*.cpp) \
-    $(wildcard $(LOCAL_PATH)/vendor/RakNet/SAMP/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/vendor/raknet /*.cpp) \
+    $(wildcard $(LOCAL_PATH)/vendor/raknet/SAMP/*.cpp) \
     $(wildcard $(LOCAL_PATH)/vendor/imgui/*.cpp) \
     $(wildcard $(LOCAL_PATH)/vendor/hash/md5.cpp)
 
