@@ -10,35 +10,28 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest # Используем Ubuntu, так как это наиболее распространенное окружение для GitHub Actions
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Set up Android NDK
-      # Рекомендуемый способ: использование action для установки NDK
-      # Вы можете указать конкретную версию NDK
-      uses: android-ndk/setup-ndk@v1
+      uses: actions/setup-ndk@v2 # Используйте актуальную версию экшна
       with:
-        ndk: 'r21e' # Например, r21e. Замените на нужную вам версию.
-        # Если вы настаиваете на r16b, вам, возможно, придется скачать его вручную
-        # или найти action, который поддерживает такие старые версии.
-
-    - name: Configure NDK environment variables
-      run: |
-        echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle" >> $GITHUB_ENV # Для старых NDK
-        # Или, если используете setup-ndk, он, скорее всего, уже это сделает.
-        # Убедитесь, что ndk-build находится в PATH
+        ndk-version: '21.4.7075529' # Пример: r21e. Замените на нужную вам версию NDK.
+                                   # Если хотите r16b, попробуйте '16.1.4479499'.
+                                   # Если он не найдет r16b, вам придется вручную скачать и настроить.
 
     - name: Build JNI with ndk-build
       run: |
-        cd your_jni_project_folder # Перейдите в папку, где находится ваш Android.mk
-        ndk-build V=1 # V=1 для подробного вывода
-        # Убедитесь, что ndk-build сгенерировал файл в ./libs/armeabi-v7a/libsampvoice.so
+        # actions/setup-ndk автоматически добавляет ndk-build в PATH
+        # Вам, возможно, придется перейти в нужную директорию
+        cd your_jni_project_folder
+        ndk-build V=1
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: libsampvoice-so
-        path: your_jni_project_folder/libs/armeabi-v7a/libsampvoice.so # Проверьте этот путь!
+        path: your_jni_project_folder/libs/armeabi-v7a/libsampvoice.so # Проверьте этот путь
