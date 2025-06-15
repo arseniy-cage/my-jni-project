@@ -5,17 +5,17 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := openal
-LOCAL_SRC_FILES := vendor/openal/libopenal.a # Относительно LOCAL_PATH (т.е. jni/vendor/openal/libopenal.a)
+LOCAL_SRC_FILES := vendor/openal/libopenal.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := opus
-LOCAL_SRC_FILES := vendor/opus/libopus.a # Относительно LOCAL_PATH
+LOCAL_SRC_FILES := vendor/opus/libopus.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := enet
-LOCAL_SRC_FILES := vendor/enet/libenet.a # Относительно LOCAL_PATH
+LOCAL_SRC_FILES := vendor/enet/libenet.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 
@@ -28,7 +28,6 @@ LOCAL_LDLIBS := -llog -lOpenSLES -lGLESv2 -lEGL
 
 # Include directories for headers
 # Ensure all directories containing header files (.h) are listed here.
-# *** ИСПРАВЛЕНО: Убран лишний 'jni/' из всех путей ***
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/vendor/ini \
                     $(LOCAL_PATH)/vendor/raknet \
                     $(LOCAL_PATH)/vendor/raknet/SAMP \
@@ -45,11 +44,10 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/vendor/ini \
                     $(LOCAL_PATH)/gtare \
                     $(LOCAL_PATH)/clientlogic \
                     $(LOCAL_PATH)/gui \
-                    $(LOCAL_PATH)/santrope-tea-gtasa/encryption # Это путь относительно jni/
+                    $(LOCAL_PATH)/santrope-tea-gtasa/encryption
 
 # Source files for the sampvoice module
 # List all .cpp and .c files here.
-# *** ИСПРАВЛЕНО: Убран лишний 'jni/' из всех путей ***
 LOCAL_SRC_FILES := \
     $(wildcard $(LOCAL_PATH)/*.cpp) \
     $(wildcard $(LOCAL_PATH)/game/*.cpp) \
@@ -66,7 +64,7 @@ LOCAL_SRC_FILES := \
     $(wildcard $(LOCAL_PATH)/santrope-tea-gtasa/encryption/*.cpp) \
     $(wildcard $(LOCAL_PATH)/santrope-tea-gtasa/encryption/*.c) \
     $(wildcard $(LOCAL_PATH)/vendor/ini/*.cpp) \
-    $(wildcard $(LOCAL_PATH)/vendor/raknet /*.cpp) \
+    $(wildcard $(LOCAL_PATH)/vendor/raknet/*.cpp) \
     $(wildcard $(LOCAL_PATH)/vendor/raknet/SAMP/*.cpp) \
     $(wildcard $(LOCAL_PATH)/vendor/imgui/*.cpp) \
     $(wildcard $(LOCAL_PATH)/vendor/hash/md5.cpp)
