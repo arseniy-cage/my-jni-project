@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest # Используем Ubuntu, так как будем скачивать Linux-версию NDK
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
@@ -34,10 +34,9 @@ jobs:
 
         echo "Verifying ndk-build presence:"
         which ndk-build || echo "ndk-build not found in PATH yet (this is normal after adding to GITHUB_PATH)"
-        # Проверяем напрямую по полному пути
         if [ -f "$NDK_DIR/ndk-build" ]; then
           echo "ndk-build found at $NDK_DIR/ndk-build"
-          "$NDK_DIR/ndk-build" --version || true # Попробуем вызвать, если поддерживается
+          "$NDK_DIR/ndk-build" --version || true
         else
           echo "Error: ndk-build not found at $NDK_DIR/ndk-build"
           exit 1
@@ -47,29 +46,25 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '8' # Android NDK r16b лучше всего работает с Java 8
+        java-version: '8'
 
     - name: Build JNI with ndk-build
       run: |
-        # !ВАЖНО!: Замените 'your_jni_project_folder' на реальный путь к вашей папке с JNI-исходниками
-        # Например, если ваш Android.mk находится в 'app/src/main/jni', то это будет 'app/src/main'
-        cd your_jni_project_folder
-
-        # Если вам нужно указать конкретные ABI, используйте APP_ABI
-        # Например, для сборки только под armeabi-v7a:
+        # Переходим в папку 'jni', так как Android.mk находится там
+        cd jni
         ndk-build APP_ABI="armeabi-v7a" V=1
 
     - name: Verify output file existence
       run: |
-        # !ВАЖНО!: Замените 'your_jni_project_folder' на реальный путь
-        OUTPUT_FILE="your_jni_project_folder/libs/armeabi-v7a/libsampvoice.so"
+        # Путь к выходному файлу, относительно корня репозитория,
+        # так как ndk-build был запущен в папке jni
+        OUTPUT_FILE="jni/libs/armeabi-v7a/libsampvoice.so"
         if [ -f "$OUTPUT_FILE" ]; then
           echo "File $OUTPUT_FILE found successfully!"
           ls -lh "$OUTPUT_FILE"
         else
           echo "Error: File $OUTPUT_FILE not found!"
-          # Показать содержимое папки libs для отладки
-          ls -R your_jni_project_folder/libs || true
+          ls -R jni/libs || true
           exit 1
         fi
 
@@ -77,5 +72,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: libsampvoice-so
-        # !ВАЖНО!: Замените 'your_jni_project_folder' на реальный путь
-        path: your_jni_project_folder/libs/armeabi-v7a/libsampvoice.so
+        # Путь к выходному файлу, относительно корня репозитория
+        path: jni/libs/armeabi-v7a/libsampvoice.so
