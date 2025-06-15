@@ -18,30 +18,32 @@ jobs:
 
     - name: Download and Extract Android NDK r16b
       run: |
-        # URL для скачивания Linux x86 (64-bit) версии NDK r16b
-        # Важно: убедитесь, что эта ссылка все еще работает!
         NDK_URL="https://dl.google.com/android/repository/android-ndk-r16b-linux-x86_64.zip"
-        NDK_DIR="$HOME/android-ndk-r16b"
+        NDK_ROOT_FOLDER="android-ndk-r16b"
+        NDK_DIR="$HOME/$NDK_ROOT_FOLDER"
 
         echo "Downloading NDK from $NDK_URL"
         curl -L "$NDK_URL" -o ndk.zip
 
-        echo "Unzipping NDK to $NDK_DIR"
+        echo "Unzipping NDK to $HOME"
         unzip -q ndk.zip -d "$HOME"
-        mv "$HOME/android-ndk-r16b" "$NDK_DIR" # Перемещаем, чтобы имя папки было чистым
 
-        # Добавляем путь к ndk-build в PATH для текущего и последующих шагов
+        echo "Adding NDK to PATH and setting NDK_HOME"
         echo "$NDK_DIR" >> $GITHUB_PATH
-        echo "NDK_HOME=$NDK_DIR" >> $GITHUB_ENV # Устанавливаем NDK_HOME переменную окружения
+        echo "NDK_HOME=$NDK_DIR" >> $GITHUB_ENV
 
-        # Проверяем, что ndk-build доступен
         echo "Verifying ndk-build presence:"
-        which ndk-build
-        ndk-build --version || true # Должен показать версию или ошибку, если не найден
+        which ndk-build || echo "ndk-build not found in PATH yet (this is normal after adding to GITHUB_PATH)"
+        # Проверяем напрямую по полному пути
+        if [ -f "$NDK_DIR/ndk-build" ]; then
+          echo "ndk-build found at $NDK_DIR/ndk-build"
+          "$NDK_DIR/ndk-build" --version || true # Попробуем вызвать, если поддерживается
+        else
+          echo "Error: ndk-build not found at $NDK_DIR/ndk-build"
+          exit 1
+        fi
 
     - name: Set up Java (required by ndk-build in some contexts)
-      # r16b может работать со старыми версиями Java, но лучше указать,
-      # чтобы избежать проблем с более новыми версиями, которые не поддерживаются
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
@@ -56,9 +58,6 @@ jobs:
         # Если вам нужно указать конкретные ABI, используйте APP_ABI
         # Например, для сборки только под armeabi-v7a:
         ndk-build APP_ABI="armeabi-v7a" V=1
-
-        # Если вы хотите собрать для всех поддерживаемых ABI (armeabi-v7a, arm64-v8a, x86, x86_64)
-        # ndk-build V=1
 
     - name: Verify output file existence
       run: |
