@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Используем Ubuntu 24.04, который является noble
 
     steps:
     - name: Checkout repository
@@ -42,11 +42,14 @@ jobs:
           exit 1
         fi
 
-    # НОВЫЙ ШАГ: Установка libncurses5
-    - name: Install libncurses5 (dependency for NDK r16b)
+    # НОВЫЙ ИСПРАВЛЕННЫЙ ШАГ: Установка libncurses5 из Jammy
+    - name: Install libncurses5 (dependency for NDK r16b on Noble)
       run: |
+        echo "deb [trusted=yes] http://archive.ubuntu.com/ubuntu jammy main universe" | sudo tee /etc/apt/sources.list.d/jammy-temp.list
         sudo apt-get update
-        sudo apt-get install -y libncurses5
+        sudo apt-get install -y libncurses5/jammy
+        sudo rm /etc/apt/sources.list.d/jammy-temp.list
+        sudo apt-get update # Clean up apt sources
 
     - name: Set up Java (required by ndk-build in some contexts)
       uses: actions/setup-java@v4
