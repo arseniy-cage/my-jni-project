@@ -1,70 +1,44 @@
-name: Build JNI with Windows NDK r16b
+name: Build JNI Library
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest # Используем Ubuntu, так как это наиболее распространенное окружение для GitHub Actions
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: |
-        # Устанавливаем необходимые инструменты
-        choco install -y 7zip curl
+    - name: Set up Android NDK
+      # Рекомендуемый способ: использование action для установки NDK
+      # Вы можете указать конкретную версию NDK
+      uses: android-ndk/setup-ndk@v1
+      with:
+        ndk: 'r21e' # Например, r21e. Замените на нужную вам версию.
+        # Если вы настаиваете на r16b, вам, возможно, придется скачать его вручную
+        # или найти action, который поддерживает такие старые версии.
 
-    - name: Download NDK from Google Drive
+    - name: Configure NDK environment variables
       run: |
-        # Скачиваем через google-drive-downloader
-        $fileId = "1ThXZY2oy-K1ycO489_9P7OO4evG4lcIT"
-        $output = "ndk.zip"
-        
-        # Получаем подтверждающий код
-        $confirmCode = (curl.exe -s -L -b "/tmp/cookies.txt" "https://drive.google.com/uc?export=download&id=$fileId" | Select-String -Pattern "confirm=([0-9A-Za-z_]+)" | ForEach-Object { $_.Matches.Groups[1].Value })
-        
-        if (-not $confirmCode) {
-          $confirmCode = "t" # fallback
-        }
-        
-        # Скачиваем файл с подтверждением
-        curl.exe -L -b "/tmp/cookies.txt" "https://drive.google.com/uc?export=download&id=$fileId&confirm=$confirmCode" -o $output
-        
-        # Проверяем размер файла (должен быть больше 1MB)
-        $fileInfo = Get-Item $output
-        if ($fileInfo.Length -lt 1MB) {
-          Write-Error "Downloaded file is too small! Probably failed to download."
-          exit 1
-        }
+        echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle" >> $GITHUB_ENV # Для старых NDK
+        # Или, если используете setup-ndk, он, скорее всего, уже это сделает.
+        # Убедитесь, что ndk-build находится в PATH
 
-    - name: Extract NDK
+    - name: Build JNI with ndk-build
       run: |
-        7z x ndk.zip -o"$env:USERPROFILE\android-ndk-r16b" -y
-        if (-not (Test-Path "$env:USERPROFILE\android-ndk-r16b\ndk-build.cmd")) {
-          Write-Error "NDK extraction failed or ndk-build.cmd not found!"
-          exit 1
-        }
-        echo "NDK_HOME=$env:USERPROFILE\android-ndk-r16b" >> $env:GITHUB_ENV
-        echo "$env:USERPROFILE\android-ndk-r16b" >> $env:GITHUB_PATH
+        cd your_jni_project_folder # Перейдите в папку, где находится ваш Android.mk
+        ndk-build V=1 # V=1 для подробного вывода
+        # Убедитесь, что ndk-build сгенерировал файл в ./libs/armeabi-v7a/libsampvoice.so
 
-    - name: Verify NDK
-      run: |
-        echo "NDK contents:"
-        dir "$env:NDK_HOME"
-        call "$env:NDK_HOME\ndk-build.cmd" --version
-
-    - name: Build JNI
-      run: |
-        cd $env:GITHUB_WORKSPACE
-        call "$env:NDK_HOME\ndk-build.cmd" -C . clean
-        call "$env:NDK_HOME\ndk-build.cmd" -C .
-
-    - name: Upload artifacts
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: jni-libs
-        path: libs/
+        name: libsampvoice-so
+        path: your_jni_project_folder/libs/armeabi-v7a/libsampvoice.so # Проверьте этот путь!
