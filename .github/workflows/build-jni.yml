@@ -42,6 +42,12 @@ jobs:
           exit 1
         fi
 
+    # НОВЫЙ ШАГ: Установка libncurses5
+    - name: Install libncurses5 (dependency for NDK r16b)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libncurses5
+
     - name: Set up Java (required by ndk-build in some contexts)
       uses: actions/setup-java@v4
       with:
@@ -50,14 +56,11 @@ jobs:
 
     - name: Build JNI with ndk-build
       run: |
-        # Переходим в папку 'jni', так как Android.mk находится там
         cd jni
         ndk-build APP_ABI="armeabi-v7a" V=1
 
     - name: Verify output file existence
       run: |
-        # Путь к выходному файлу, относительно корня репозитория,
-        # так как ndk-build был запущен в папке jni
         OUTPUT_FILE="jni/libs/armeabi-v7a/libsampvoice.so"
         if [ -f "$OUTPUT_FILE" ]; then
           echo "File $OUTPUT_FILE found successfully!"
@@ -72,5 +75,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: libsampvoice-so
-        # Путь к выходному файлу, относительно корня репозитория
         path: jni/libs/armeabi-v7a/libsampvoice.so
